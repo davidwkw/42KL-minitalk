@@ -2,35 +2,40 @@
 
 static void	success_handler(int signum)
 {
+	char	*success;
+
+	success = "Message successfully printed\n";
 	if (signum == SIGUSR1)
-		return (write(1, "Message successfully printed", 1));
+	{
+		write(1, success, ft_strlen(success));
+		exit(0);
+	}
 }
 
-static void	dispatch_handler(pid_t pid, char c)
+static void	dispatch_handler(pid_t pid, unsigned char c)
 {
 	int	status;
 	int	bits;
 
-	bits = 8;
+	bits = 7;
 	while (bits >= 0)
 	{
-		if (c & (1 << bits))
+		if (c & (1 << bits--))
 			status = kill(pid, SIGUSR1);
 		else
 			status = kill(pid, SIGUSR2);
-		bits--;
 		if (status != 0)
-			error_handler("A signal was not sent");
+			error_handler("A signal was not sent\n");
+		usleep(50);
 	}
 }
 
 int	main(int argc, char **argv)
 {
 	pid_t	pid;
-	int		bit;
 
 	if (argc != 3)
-		error_handler("Invalid input. Try ./client [PID] [message]");
+		error_handler("Invalid input. Try ./client [PID] [message]\n");
 	signal(SIGUSR1, success_handler);
 	pid = (pid_t)ft_atoi(argv[1]);
 	while (*argv[2])

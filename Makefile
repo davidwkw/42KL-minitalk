@@ -20,21 +20,21 @@ CFLAGS	= -Wall -Werror -Wextra -I.
 
 LIBDIR	= ./libft
 
-LIBFT	= $(LIBFTDIR)/libft.a
+LIBFT	= $(LIBDIR)/libft.a
 
 all		: $(CLIENT) $(SERVER)
 
 $(LIBFT) :
 	@echo "Making libft"
-	@make -C $(LIBDIR)
+	@make -C $(LIBDIR) all
 
-$(CLIENT) : $(COBJS) $(UOBJS) $(LIBFT)
+$(CLIENT) : $(LIBFT) $(COBJS) $(UOBJS)
 	@echo "Creating $(CLIENT)"
-	@$(CC) $(CFLAGS) -o $(COBJS) $(UOBJS) $(LIBFT)
+	@$(CC) $(CFLAGS) $(COBJS) $(UOBJS) $(LIBFT) -o $@
 
-$(SERVER) : $(SOBJS) $(UOBJS) $(LIBFT)
+$(SERVER) : $(LIBFT) $(SOBJS) $(UOBJS)
 	@echo "Creating $(SERVER)"
-	@$(CC) $(CFLAGS) -o $(SOBJS) $(UOBJS) $(LIBFT)
+	@$(CC) $(CFLAGS) $(SOBJS) $(UOBJS) $(LIBFT) -o $@
 
 bonus	: all
 

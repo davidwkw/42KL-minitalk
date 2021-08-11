@@ -1,19 +1,26 @@
 #include "minitalk.h"
 #include <stdarg.h>
 
-void	signal_handler(int signum, siginfo_t *siginfo, void *context)
+#define GREEN "\033[92m"
+#define BOLD "\033[1m"
+#define WHITE "\033[97m"
+#define CYAN "\033[96m"
+
+static void	signal_handler(int signum, siginfo_t *siginfo, void *context)
 {
-	static unsigned char	c;
-	static int				bits;
+	static unsigned char	c = 0;
+	static int				bits = 0;
+	static pid_t			pid = 0;
 	
 	(void)context;
-	bits = 0;
-	if (signum == SIGUSR1)
-		c = (c << 1) + 1;
-	else if (signum == SIGUSR2)
-		c <<= 1;
-	bits++;
-	if (bits == 8)
+	if (pid != siginfo->si_pid)
+	{
+		c = 0;
+		bits = 0;
+		pid = siginfo->si_pid;
+	}
+	c = (c << 1) + (signum == SIGUSR1);
+	if (++bits == 8)
 	{
 		if (c == 4)
 		{
@@ -27,28 +34,23 @@ void	signal_handler(int signum, siginfo_t *siginfo, void *context)
 	}
 }
 
-static void	init_sigaction(int num, void (*f)(int, siginfo_t, void *), int flag, ...)
+static void	init_sigaction(int num, ...)
 {
 	va_list	args;
 	int		i;
 	struct	sigaction	sa;
-	int		signal_num;
+	int		signum;
 
-	va_start(args, flag);
+	va_start(args, num);
 	sigemptyset(&sa.sa_mask);
-	if (flag)
-	{
-		sa.sa_sigaction = f;
-		sa.sa_flags = SA_SIGINFO;
-	}
-	else
-		sa.sa_handler = f;
+	sa.sa_flags = SA_SIGINFO;
+	sa.sa_sigaction = &signal_handler;
 	i = -1;
 	while (++i < num)
 	{
-		signal_num = va_arg(args, int);
-		sigaddset(&sa.sa_mask, signal_num);
-		if (sigaction(signal_num, &sa, NULL) != 0);
+		signum = va_arg(args, int);
+		sigaddset(&sa.sa_mask, signum);
+		if (sigaction(signum, &sa, NULL) != 0)
 		 	error_handler("Error establishing signal handler.");
 	}
 	va_end(args);
@@ -56,10 +58,10 @@ static void	init_sigaction(int num, void (*f)(int, siginfo_t, void *), int flag,
 
 int	main(void)
 {
-	init_sigaction(2, &signal_handler, NULL, SIGUSR1, SIGUSR2);
-	ft_putstr_fd("Current PID number is :", 1);
-	ft_putnbr_fd(1, (int)getpid());
-	ft_putchar_fd('\n', 1);
+	init_sigaction(2, SIGUSR1, SIGUSR2);
+	ft_putstr_fd(BOLD GREEN "Server PID number is : " CYAN , 1);
+	ft_putnbr_fd(getpid(), 1);
+	ft_putstr_fd("\n" BOLD WHITE, 1);
 	while (1)
 		pause();
 	return (0);
