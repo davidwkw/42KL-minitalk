@@ -20,9 +20,9 @@
 
 static void	signal_handler(int signum, siginfo_t *siginfo, void *context)
 {
-	static unsigned char	c = 0;
-	static int				bits = 0;
-	static pid_t			pid = 0;
+	static char		c = 0;
+	static int		bits = 0;
+	static pid_t	pid = 0;
 
 	(void)context;
 	if (pid != siginfo->si_pid)
@@ -46,7 +46,7 @@ static void	signal_handler(int signum, siginfo_t *siginfo, void *context)
 	}
 }
 
-static void	init_sigaction(int num, ...)
+static void	init_sigaction(void (*f)(int, siginfo_t *, void *), int num, ...)
 {
 	va_list				args;
 	int					i;
@@ -56,7 +56,7 @@ static void	init_sigaction(int num, ...)
 	va_start(args, num);
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_SIGINFO;
-	sa.sa_sigaction = &signal_handler;
+	sa.sa_sigaction = f;
 	i = -1;
 	while (++i < num)
 	{
@@ -70,7 +70,7 @@ static void	init_sigaction(int num, ...)
 
 int	main(void)
 {
-	init_sigaction(2, SIGUSR1, SIGUSR2);
+	init_sigaction(&signal_handler, 2, SIGUSR1, SIGUSR2);
 	ft_putstr_fd(BOLD GREEN "Server PID number is : " CYAN, 1);
 	ft_putnbr_fd(getpid(), 1);
 	ft_putstr_fd("\n" BOLD WHITE, 1);

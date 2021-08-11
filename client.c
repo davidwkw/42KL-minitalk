@@ -24,7 +24,7 @@ static void	success_handler(int signum)
 	}
 }
 
-static void	dispatch_handler(pid_t pid, unsigned char c)
+static void	dispatch_handler(pid_t pid, char c)
 {
 	int	status;
 	int	bits;
