@@ -11,7 +11,7 @@ static void	signal_handler(int signum, siginfo_t *siginfo, void *context)
 	static unsigned char	c = 0;
 	static int				bits = 0;
 	static pid_t			pid = 0;
-	
+
 	(void)context;
 	if (pid != siginfo->si_pid)
 	{
@@ -36,10 +36,10 @@ static void	signal_handler(int signum, siginfo_t *siginfo, void *context)
 
 static void	init_sigaction(int num, ...)
 {
-	va_list	args;
-	int		i;
-	struct	sigaction	sa;
-	int		signum;
+	va_list				args;
+	int					i;
+	struct sigaction	sa;
+	int					signum;
 
 	va_start(args, num);
 	sigemptyset(&sa.sa_mask);
@@ -51,7 +51,7 @@ static void	init_sigaction(int num, ...)
 		signum = va_arg(args, int);
 		sigaddset(&sa.sa_mask, signum);
 		if (sigaction(signum, &sa, NULL) != 0)
-		 	error_handler("Error establishing signal handler.");
+			error_handler("Error establishing signal handler.");
 	}
 	va_end(args);
 }
@@ -59,7 +59,7 @@ static void	init_sigaction(int num, ...)
 int	main(void)
 {
 	init_sigaction(2, SIGUSR1, SIGUSR2);
-	ft_putstr_fd(BOLD GREEN "Server PID number is : " CYAN , 1);
+	ft_putstr_fd(BOLD GREEN "Server PID number is : " CYAN, 1);
 	ft_putnbr_fd(getpid(), 1);
 	ft_putstr_fd("\n" BOLD WHITE, 1);
 	while (1)

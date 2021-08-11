@@ -1,4 +1,4 @@
-#ifndef MINTALK_H
+#ifndef MINITALK_H
 
 # define MINITALK_H
 # define _GNU_SOURCE
